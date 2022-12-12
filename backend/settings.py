@@ -78,11 +78,11 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
      'default': {
          'ENGINE': 'sql_server.pyodbc',
-         'NAME': 'Imatics_DB',
-         'USER': 'imaticsmanager@imaticsserver',
-         'PASSWORD': '{your_password_here}',
-         'HOST': 'imaticsserver.Imatics_DB.windows.net',
-         'PORT': '',
+         'NAME': 'my-imatics-db-1',
+         'USER': 'imaticsdb',
+         'PASSWORD': 'Mysql@1db',
+         'HOST': 'my-imatics-db-1.mysql.database.azure.com',
+         'PORT': '3306',
          'OPTIONS': {
             'driver': 'ODBC Driver 13 for SQL Server',
         },
