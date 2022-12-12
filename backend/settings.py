@@ -76,10 +76,17 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+     'default': {
+         'ENGINE': 'sql_server.pyodbc',
+         'NAME': 'Imatics_DB',
+         'USER': 'imaticsmanager@imaticsserver',
+         'PASSWORD': '{your_password_here}',
+         'HOST': 'imaticsserver.Imatics_DB.windows.net',
+         'PORT': '',
+         'OPTIONS': {
+            'driver': 'ODBC Driver 13 for SQL Server',
+        },
+    },
 }
 
 
