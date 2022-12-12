@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -71,22 +72,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-
+hostname = os.environ['DBHOST']
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-     'default': {
-         'ENGINE': 'sql_server.pyodbc',
-         'NAME': 'my-imatics-db-1',
-         'USER': 'imaticsdb',
-         'PASSWORD': 'Mysql@1db',
-         'HOST': 'my-imatics-db-1.mysql.database.azure.com',
-         'PORT': '3306',
-         'OPTIONS': {
-            'driver': 'ODBC Driver 13 for SQL Server',
-        },
-    },
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ['DBNAME'],
+        'HOST': hostname + ".mysql.database.azure.com",
+        'USER': os.environ['DBUSER'],
+        'PASSWORD': os.environ['DBPASS'] 
+    }
 }
 
 
