@@ -4,7 +4,7 @@ from django.db import models
 
 
 class UserDetail(models.Model):
-    mob = models.IntegerField(null=True)
+    mob = models.IntegerField(null=False)
 
 
 class CarDetail(models.Model):
