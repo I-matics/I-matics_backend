@@ -21,7 +21,7 @@ class CarDetail(models.Model):
     my = models.FloatField(null=True)
     mz = models.FloatField(null=True)
     speed = models.FloatField(null=True)
-    GPS = models.TextField(null=True)
+    gPS = models.TextField(null=True)
     C1_f = models.FloatField(null=True)
     C2_f = models.FloatField(null=True)
     C3_f = models.FloatField(null=True)
