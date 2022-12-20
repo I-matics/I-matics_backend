@@ -27,9 +27,9 @@ class CarDetail(models.Model):
     C3 = models.FloatField(null=True)
     C4 = models.FloatField(null=True)
     C5 = models.FloatField(null=True)
-    C6 = models.CharField(null=True, max_length=100)
-    C7 = models.CharField(null=True, max_length=100)
-    C8 = models.CharField(null=True, max_length=100)
+    C6 = models.models.TextField(null=True)
+    C7 = models.models.TextField(null=True)
+    C8 = models.models.TextField(null=True)
     
     # Hard_Acc = models.IntegerField(null=True)
     # Hard_brake = models.IntegerField(null=True)
