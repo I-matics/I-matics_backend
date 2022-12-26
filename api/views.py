@@ -2,6 +2,7 @@ from django.shortcuts import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+import random
 #import pandas as pd
 
 from .serializers import CarDetailSerializer, UserdetailSerializer
@@ -68,3 +69,9 @@ def user_detail(request):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+def generate_random(request,pk):
+    if request.method == 'GET':
+        r = random.randint(1,100)
+        return Response(r)
