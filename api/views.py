@@ -73,5 +73,6 @@ def user_detail(request):
 @api_view(['GET'])
 def generate_random(request,pk):
     if request.method == 'GET':
+        print(pk)
         r = random.randint(1,100)
         return Response(r)
