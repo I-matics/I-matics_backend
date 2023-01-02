@@ -3,7 +3,11 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 import random
-#import pandas as pd
+import math
+import pandas as pd
+import datetime
+from datetime import timedelta
+from django.shortcuts import get_object_or_404
 
 from .serializers import CarDetailSerializer, UserdetailSerializer
 from .models import CarDetail
@@ -42,9 +46,9 @@ def hello_world(request):
     elif request.method == 'POST':
         # Trip_no = int(request.data["Trip_no"])
         # Trip_time = request.data["Trip_time"]
-        # ax = float(request.data["ax"])
-        # ay = float(request.data["ay"])
-        # az = float(request.data["az"])
+        ax = float(request.data["ax"])
+        ay = float(request.data["ay"])
+        az = float(request.data["az"])
         # gx = float(request.data["gx"])
         # gy = float(request.data["gy"])
         # gz = float(request.data["gz"])
@@ -56,6 +60,12 @@ def hello_world(request):
         # detail = Trip_Abs_Scoring(ax, ay, az, speed)
         # Merge(request.data, detail)
         # print(detail)
+        #get ax,ay,az  then calculate result(sqrt(x2+y2+z2))
+        # net = math.sqrt((ax*ax)+(ay*ay)+(az*az))
+        # if net > 1.3:
+        #
+            
+        # store the resultant value
         serializer = CarDetailSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -70,9 +80,37 @@ def user_detail(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
 @api_view(['GET'])
 def generate_random(request,pk):
     if request.method == 'GET':
-        print(pk)
-        r = random.randint(1,100)
-        return Response(r)
+        # Get data from database using pk --CarDetail.objects.filter()
+        car_detail = CarDetail.objects.filter(mob_id_id = pk).values()
+        # car_detail = get_object_or_404(CarDetail, mob_id_id=pk).values()
+        car_df = pd.DataFrame(car_detail)
+        # datetime1 = datetime.datetime.now()
+        # for i in range(0, len(car_df)):
+        #     start_date = datetime.datetime.now()
+        #     end_date = datetime1 + timedelta(days=2)
+        #     random_date = start_date + (end_date - start_date) * random.random()
+        #     car_df.loc[i, 'Trip_time'] = random_date 
+        #     car_df.loc[i, 'Trip_time'] = random_date
+        # for i in range(0, len(car_df)):
+        #     car_df.loc[i, 'resultant']= random.uniform(0.5, 15.5)
+        for i in range(1, len(car_df)):
+            if car_df.loc[i, 'resultant'] > 1.3:
+                 if car_df.loc[i, 'resultant'] - car_df.loc[i-1, 'resultant'] > 0.2:
+                     car_df.loc[i, 'count'] = 1
+                 else:car_df.loc[i, 'count'] = 0
+            else:
+                car_df.loc[i, 'count'] = 0 
+        risk_instance = car_df['count'].sum()
+        avg_speed = car_df['speed'].mean()
+        dist_travelled = avg_speed *(car_df.loc[len(car_df['Trip_time'])-1, 'Trip_time'] - car_df.loc[0, 'Trip_time'])
+        dist_travelled1 = dist_travelled.total_seconds()/60       
+        # filter data if result>1.3 then check (resultant-(previous resultant))>0.2 then count 1
+        # Average speed, Duration of travel, distance travelled = Average speed*Duration of travel
+        # Return the value
+        # r = random.randint(1,100)
+        return Response({"Risk Instance":risk_instance,"Average_speed":avg_speed,"Distance Travelled":dist_travelled1})
+
