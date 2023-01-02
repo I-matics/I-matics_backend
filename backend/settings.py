@@ -78,11 +78,13 @@ hostname = os.environ['DBHOST']
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ['DBNAME'],
-        'HOST': hostname + ".mysql.database.azure.com",
-        'USER': os.environ['DBUSER'],
-        'PASSWORD': os.environ['DBPASS'] 
+        'ENGINE': '',
+        'NAME': ''
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': os.environ['DBNAME'],
+#         'HOST': hostname + ".mysql.database.azure.com",
+#         'USER': os.environ['DBUSER'],
+#         'PASSWORD': os.environ['DBPASS'] 
     }
 }
 
