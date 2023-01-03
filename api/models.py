@@ -39,7 +39,7 @@ class CarDetail(models.Model):
     C13 = models.TextField(null=True)
     C14 = models.TextField(null=True)
     C15 = models.TextField(null=True)
-    resultant = models.TextField(null=True)
+    resultant = models.FloatField(null=True)
     # Hard_Acc = models.IntegerField(null=True)
     # Hard_brake = models.IntegerField(null=True)
     # Hard_cornering = models.IntegerField(null=True)
