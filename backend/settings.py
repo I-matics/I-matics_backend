@@ -75,19 +75,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-# hostname = os.environ['DBHOST']
+hostname = os.environ['DBHOST']
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': '',
-        'NAME': ''
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': os.environ['DBNAME'],
-#         'HOST': hostname + ".mysql.database.azure.com",
-#         'USER': os.environ['DBUSER'],
-#         'PASSWORD': os.environ['DBPASS'] 
+#         'ENGINE': '',
+#         'NAME': ''
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ['DBNAME'],
+        'HOST': hostname + ".mysql.database.azure.com",
+        'USER': os.environ['DBUSER'],
+        'PASSWORD': os.environ['DBPASS'] 
     }
 }
 
