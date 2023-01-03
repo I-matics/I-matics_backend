@@ -4,11 +4,13 @@ from django.db import models
 
 
 class UserDetail(models.Model):
-    mob = models.IntegerField(null=False)
+    mob = models.BigIntegerField(null=False)
+    Trip = models.BigIntegerField(null=True)
 
 
 class CarDetail(models.Model):
     mob_id = models.ForeignKey(UserDetail, on_delete=models.CASCADE)
+    
     Trip_no = models.IntegerField(null=True)
     Trip_time = models.CharField(null=True, max_length=50)
     ax = models.FloatField(null=True)
@@ -27,10 +29,17 @@ class CarDetail(models.Model):
     C3 = models.FloatField(null=True)
     C4 = models.FloatField(null=True)
     C5 = models.FloatField(null=True)
-    C6 = models.TextField(null=True)
+    C6 = models.FloatField(null=True)
+    C7 = models.FloatField(null=True)
+    C8 = models.FloatField(null=True)
+    C9 = models.FloatField(null=True)
+    C10 = models.FloatField(null=True)
+    C11 = models.FloatField(null=True)
+    C12 = models.FloatField(null=True)
+    C13 = models.TextField(null=True)
+    C14 = models.TextField(null=True)
+    C15 = models.TextField(null=True)
     resultant = models.TextField(null=True)
-    C8 = models.TextField(null=True)
-    
     # Hard_Acc = models.IntegerField(null=True)
     # Hard_brake = models.IntegerField(null=True)
     # Hard_cornering = models.IntegerField(null=True)
