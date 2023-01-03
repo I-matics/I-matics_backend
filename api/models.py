@@ -28,7 +28,7 @@ class CarDetail(models.Model):
     C4 = models.FloatField(null=True)
     C5 = models.FloatField(null=True)
     C6 = models.TextField(null=True)
-    C7 = models.TextField(null=True)
+    resultant = models.TextField(null=True)
     C8 = models.TextField(null=True)
     
     # Hard_Acc = models.IntegerField(null=True)
