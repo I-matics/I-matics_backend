@@ -106,11 +106,11 @@ def generate_random(request,pk):
                 car_df.loc[i, 'count'] = 0 
         risk_instance = car_df['count'].sum()
         avg_speed = car_df['speed'].mean()
-        dist_travelled = avg_speed *(car_df.loc[len(car_df['Trip_time'])-1, 'Trip_time'] - car_df.loc[0, 'Trip_time'])
-        dist_travelled1 = dist_travelled.total_seconds()/60       
+#         dist_travelled = avg_speed *(car_df.loc[len(car_df['Trip_time'])-1, 'Trip_time'] - car_df.loc[0, 'Trip_time'])
+#         dist_travelled1 = dist_travelled.total_seconds()/60       
         # filter data if result>1.3 then check (resultant-(previous resultant))>0.2 then count 1
         # Average speed, Duration of travel, distance travelled = Average speed*Duration of travel
         # Return the value
         # r = random.randint(1,100)
-        return Response({"Risk Instance":risk_instance,"Average_speed":avg_speed,"Distance Travelled":dist_travelled1})
+        return Response({"Risk Instance":risk_instance,"Average_speed":avg_speed})
 
