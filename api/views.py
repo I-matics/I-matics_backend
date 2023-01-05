@@ -99,18 +99,22 @@ def generate_random(request,pk):
         #     car_df.loc[i, 'resultant']= random.uniform(0.5, 15.5)
         for i in range(1, len(car_df)):
             if car_df.loc[i, 'resultant'] > 1.3:
-                 if car_df.loc[i, 'resultant'] - car_df.loc[i-1, 'resultant'] > 0.2:
-                     car_df.loc[i, 'count'] = 1
-                 else:car_df.loc[i, 'count'] = 0
+                 if int(car_df.loc[i, 'resultant']) - int(car_df.loc[i-1, 'resultant']) > 0.2:
+                     car_df.loc[i, 'count'] = 0
+                 else:car_df.loc[i, 'count'] = 1
             else:
                 car_df.loc[i, 'count'] = 0 
         risk_instance = car_df['count'].sum()
         avg_speed = car_df['speed'].mean()
-#         dist_travelled = avg_speed *(car_df.loc[len(car_df['Trip_time'])-1, 'Trip_time'] - car_df.loc[0, 'Trip_time'])
-#         dist_travelled1 = dist_travelled.total_seconds()/60       
+        car_df['Trip_time'] = pd.to_datetime(car_df['Trip_time'])
+        dist_travelled = car_df.loc[len(car_df['Trip_time'])-1, 'Trip_time'] - car_df.loc[0, 'Trip_time']
+        total_time = dist_travelled.total_seconds()/120
+        dist_travelled1 = avg_speed*total_time
+        Score = 100*math.exp(-risk_instance*0.005)       
         # filter data if result>1.3 then check (resultant-(previous resultant))>0.2 then count 1
         # Average speed, Duration of travel, distance travelled = Average speed*Duration of travel
         # Return the value
         # r = random.randint(1,100)
-        return Response({"Risk Instance":risk_instance,"Average_speed":avg_speed})
+        return Response({"Risk_Instance":risk_instance,"Average_speed":avg_speed,"Distance_Travelled":dist_travelled1,"Score":Score})
+
 
