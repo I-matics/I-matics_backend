@@ -110,11 +110,11 @@ def generate_random(request,pk):
         dist_travelled = car_df.loc[len(car_df['Trip_time'])-1, 'Trip_time'] - car_df.loc[0, 'Trip_time']
         total_time = dist_travelled.total_seconds()/120
         dist_travelled1 = avg_speed*total_time
-        Score = 100*math.exp(-risk_instance*0.005)       
+        score = 100*math.exp(-risk_instance*0.005)       
         # filter data if result>1.3 then check (resultant-(previous resultant))>0.2 then count 1
         # Average speed, Duration of travel, distance travelled = Average speed*Duration of travel
         # Return the value
         # r = random.randint(1,100)
-        return Response({"Risk_Instance":risk_instance,"Average_speed":avg_speed,"Distance_Travelled":dist_travelled1,"Score":Score})
+        return Response({"Risk_Instance":risk_instance,"Average_speed":avg_speed,"Distance_Travelled":dist_travelled1,"Score":score})
 
 
