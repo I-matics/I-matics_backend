@@ -4,11 +4,12 @@ from rest_framework.response import Response
 from rest_framework import status
 import random
 import math
+import math
 import pandas as pd
 import datetime
 from datetime import timedelta
 from django.shortcuts import get_object_or_404
-
+from django.http import Http404
 from .serializers import CarDetailSerializer, UserdetailSerializer
 from .models import CarDetail
 
@@ -86,6 +87,10 @@ def generate_random(request,pk):
     if request.method == 'GET':
         # Get data from database using pk --CarDetail.objects.filter()
         car_detail = CarDetail.objects.filter(mob_id_id = pk).values()
+        if not car_detail:
+            car_detail = get_object_or_404(CarDetail, mob_id_id=pk).values()
+        else:
+            car_detail = CarDetail.objects.filter(mob_id_id = pk).values()
         # car_detail = get_object_or_404(CarDetail, mob_id_id=pk).values()
         car_df = pd.DataFrame(car_detail)
         # datetime1 = datetime.datetime.now()
@@ -99,22 +104,21 @@ def generate_random(request,pk):
         #     car_df.loc[i, 'resultant']= random.uniform(0.5, 15.5)
         for i in range(1, len(car_df)):
             if car_df.loc[i, 'resultant'] > 1.3:
-                 if int(car_df.loc[i, 'resultant']) - int(car_df.loc[i-1, 'resultant']) > 0.2:
+                 if int(car_df.loc[i, 'resultant']) - int(car_df.loc[i-1, 'resultant']) < 0.2:
                      car_df.loc[i, 'count'] = 0
-                 else:car_df.loc[i, 'count'] = 1
+                 else:car_df.loc[i, 'count'] =1
             else:
                 car_df.loc[i, 'count'] = 0 
         risk_instance = car_df['count'].sum()
-        avg_speed = car_df['speed'].mean()
+        avg_speed = round(car_df['speed'].mean(),2)
         car_df['Trip_time'] = pd.to_datetime(car_df['Trip_time'])
         dist_travelled = car_df.loc[len(car_df['Trip_time'])-1, 'Trip_time'] - car_df.loc[0, 'Trip_time']
-        total_time = dist_travelled.total_seconds()/120
-        dist_travelled1 = avg_speed*total_time
-        score = 100*math.exp(-risk_instance*0.005)       
+        total_time = round(dist_travelled.total_seconds()/3600,3)
+        Trip_time = round(dist_travelled.total_seconds()/60,3)
+        dist_travelled1 = round(avg_speed*total_time,2)
+        score = round(100*math.exp(-risk_instance*0.005),2)       
         # filter data if result>1.3 then check (resultant-(previous resultant))>0.2 then count 1
         # Average speed, Duration of travel, distance travelled = Average speed*Duration of travel
         # Return the value
         # r = random.randint(1,100)
-        return Response({"Risk_Instance":risk_instance,"Average_speed":avg_speed,"Distance_Travelled":dist_travelled1,"Score":score})
-
-
+        return Response({"Risk_Instance":risk_instance,"Average_speed":avg_speed,"Distance_Travelled":dist_travelled1,"Score":score,"Trip_Duration":Trip_time})
