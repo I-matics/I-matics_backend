@@ -122,3 +122,23 @@ def generate_random(request,pk):
         # Return the value
         # r = random.randint(1,100)
         return Response({"Risk_Instance":risk_instance,"Average_speed":avg_speed,"Distance_Travelled":dist_travelled1,"Score":score,"Trip_Duration":Trip_time})
+    
+@api_view(['GET','PUT'])
+def trip_data(request,id_n):
+    if request.method == 'GET':
+        id_detail = UserDetail.objects.filter(id = id_n).values()
+        serializer = UserdetailSerializer(
+            id_detail, many=True, context={'request': request})
+        return Response(serializer.data)
+    if request.method == 'PUT':
+        instance = get_object_or_404(UserDetail.objects.all(), pk=id_n)
+        serializer = UserdetailSerializer(instance, data=request.data)
+        # validate and update
+        if serializer.is_valid():
+            serializer.save()
+            serializer_dict = serializer.data
+            serializer_dict["Trip"] = request.data['Trip']
+            return Response(serializer_dict, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
