@@ -11,7 +11,7 @@ from datetime import timedelta
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from .serializers import CarDetailSerializer, UserdetailSerializer
-from .models import CarDetail
+from .models import CarDetail,UserDetail
 
 # Create your views here.
 
