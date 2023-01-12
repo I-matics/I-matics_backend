@@ -36,7 +36,7 @@ def Trip_Abs_Scoring(x, y, z, p):
 def calculations(car_df):      
     car_df_raw = pd.DataFrame(car_df)
     trip_no = car_df_raw['Trip_no'].unique()
-    Trip_Data = {}
+    Trip_Data = []
     for trip_n in trip_no:
         print(trip_n)
         car_df = car_df_raw[car_df_raw['Trip_no'] == trip_n]
@@ -52,6 +52,7 @@ def calculations(car_df):
                 car_df.loc[i, 'count'] = 0 
         risk_instance = car_df['count'].sum()
         # trip.append("Risk_Instance"+":"+str(risk_instance))
+        trip["Trip No"] = trip_n
         trip["Risk_Instance"] = risk_instance
         avg_speed = round(car_df['speed'].mean(),2)
         # trip.append("Average_speed"+":"+str(avg_speed))
@@ -69,7 +70,7 @@ def calculations(car_df):
         # trip.append("score"+":"+str(score))
         trip["Score"] = score
         print(trip)
-        Trip_Data["Trip No:"+str(trip_n)] = trip
+        Trip_Data.append(trip)
     return Trip_Data
 
 
@@ -158,3 +159,4 @@ def trip_data(request,id_n):
         else:
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
+                            
