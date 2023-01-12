@@ -33,6 +33,46 @@ def Trip_Abs_Scoring(x, y, z, p):
     return a
 
 
+def calculations(car_df):      
+    car_df_raw = pd.DataFrame(car_df)
+    trip_no = car_df_raw['Trip_no'].unique()
+    Trip_Data = {}
+    for trip_n in trip_no:
+        print(trip_n)
+        car_df = car_df_raw[car_df_raw['Trip_no'] == trip_n]
+        car_df = car_df.reset_index()
+        trip={}
+        for i in range(1, len(car_df)):
+            if car_df.loc[i, 'resultant'] > 1.3:
+                if int(car_df.loc[i, 'resultant']) - int(car_df.loc[i-1, 'resultant']) < 0.2:
+                    car_df.loc[i, 'count'] = 0
+                else:
+                    car_df.loc[i, 'count'] =1
+            else:
+                car_df.loc[i, 'count'] = 0 
+        risk_instance = car_df['count'].sum()
+        # trip.append("Risk_Instance"+":"+str(risk_instance))
+        trip["Risk_Instance"] = risk_instance
+        avg_speed = round(car_df['speed'].mean(),2)
+        # trip.append("Average_speed"+":"+str(avg_speed))
+        trip["Average_speed"] = avg_speed
+        car_df['Trip_time'] = pd.to_datetime(car_df['Trip_time'])
+        dist_travelled = car_df.loc[len(car_df['Trip_time'])-1, 'Trip_time'] - car_df.loc[0, 'Trip_time']
+        total_time = round(dist_travelled.total_seconds()/3600,3)
+        Trip_time = round(dist_travelled.total_seconds()/60,3)
+        # trip.append("Trip_time"+":"+str(Trip_time))
+        trip["Trip_time"] = Trip_time
+        dist_travelled1 = round(avg_speed*total_time,2)
+        # trip.append("dist_travelled"+":"+str(dist_travelled1))
+        trip["Distance Travelled"] = dist_travelled1
+        score = round(100*math.exp(-risk_instance*0.005),2) 
+        # trip.append("score"+":"+str(score))
+        trip["Score"] = score
+        print(trip)
+        Trip_Data["Trip No:"+str(trip_n)] = trip
+    return Trip_Data
+
+
 def Merge(dict1, dict2):
     return(dict2.update(dict1))
 
@@ -86,43 +126,19 @@ def user_detail(request):
 def generate_random(request,pk):
     if request.method == 'GET':
         # Get data from database using pk --CarDetail.objects.filter()
-        car_detail = CarDetail.objects.filter(mob_id_id = pk).values()
+        car_detail = CarDetail.objects.filter(mob_id_id = pk).values()   #filter data according to mobile id
         if not car_detail:
             car_detail = get_object_or_404(CarDetail, mob_id_id=pk).values()
         else:
             car_detail = CarDetail.objects.filter(mob_id_id = pk).values()
-        # car_detail = get_object_or_404(CarDetail, mob_id_id=pk).values()
-        car_df = pd.DataFrame(car_detail)
-        # datetime1 = datetime.datetime.now()
-        # for i in range(0, len(car_df)):
-        #     start_date = datetime.datetime.now()
-        #     end_date = datetime1 + timedelta(days=2)
-        #     random_date = start_date + (end_date - start_date) * random.random()
-        #     car_df.loc[i, 'Trip_time'] = random_date 
-        #     car_df.loc[i, 'Trip_time'] = random_date
-        # for i in range(0, len(car_df)):
-        #     car_df.loc[i, 'resultant']= random.uniform(0.5, 15.5)
-        for i in range(1, len(car_df)):
-            if car_df.loc[i, 'resultant'] > 1.3:
-                 if int(car_df.loc[i, 'resultant']) - int(car_df.loc[i-1, 'resultant']) < 0.2:
-                     car_df.loc[i, 'count'] = 0
-                 else:car_df.loc[i, 'count'] =1
-            else:
-                car_df.loc[i, 'count'] = 0 
-        risk_instance = car_df['count'].sum()
-        avg_speed = round(car_df['speed'].mean(),2)
-        car_df['Trip_time'] = pd.to_datetime(car_df['Trip_time'])
-        dist_travelled = car_df.loc[len(car_df['Trip_time'])-1, 'Trip_time'] - car_df.loc[0, 'Trip_time']
-        total_time = round(dist_travelled.total_seconds()/3600,3)
-        Trip_time = round(dist_travelled.total_seconds()/60,3)
-        dist_travelled1 = round(avg_speed*total_time,2)
-        score = round(100*math.exp(-risk_instance*0.005),2)       
+        Trip_Data = calculations(car_detail)
+        return Response(Trip_Data)
+  
         # filter data if result>1.3 then check (resultant-(previous resultant))>0.2 then count 1
         # Average speed, Duration of travel, distance travelled = Average speed*Duration of travel
         # Return the value
         # r = random.randint(1,100)
-        return Response({"Risk_Instance":risk_instance,"Average_speed":avg_speed,"Distance_Travelled":dist_travelled1,"Score":score,"Trip_Duration":Trip_time})
-    
+
 @api_view(['GET','PUT'])
 def trip_data(request,id_n):
     if request.method == 'GET':
