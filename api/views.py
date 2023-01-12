@@ -52,7 +52,7 @@ def calculations(car_df):
                 car_df.loc[i, 'count'] = 0 
         risk_instance = car_df['count'].sum()
         # trip.append("Risk_Instance"+":"+str(risk_instance))
-        trip["Trip No"] = trip_n
+        trip["Trip_No"] = trip_n
         trip["Risk_Instance"] = risk_instance
         avg_speed = round(car_df['speed'].mean(),2)
         # trip.append("Average_speed"+":"+str(avg_speed))
@@ -65,7 +65,7 @@ def calculations(car_df):
         trip["Trip_time"] = Trip_time
         dist_travelled1 = round(avg_speed*total_time,2)
         # trip.append("dist_travelled"+":"+str(dist_travelled1))
-        trip["Distance Travelled"] = dist_travelled1
+        trip["Distance_Travelled"] = dist_travelled1
         score = round(100*math.exp(-risk_instance*0.005),2) 
         # trip.append("score"+":"+str(score))
         trip["Score"] = score
