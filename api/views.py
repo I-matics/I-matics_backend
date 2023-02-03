@@ -35,10 +35,10 @@ def Trip_Abs_Scoring(x, y, z, p):
 
 def calculations(car_df):      
     car_df_raw = pd.DataFrame(car_df)
-    trip_no = car_df_raw['Trip_no'].unique()
+    trip_no = car_df_raw['Trip_no'].unique().tolist()
+    if 0 in trip_no: trip_no.remove(0)
     Trip_Data = []
     for trip_n in trip_no:
-        print(trip_n)
         car_df = car_df_raw[car_df_raw['Trip_no'] == trip_n]
         car_df = car_df.reset_index()
         trip={}
@@ -69,7 +69,6 @@ def calculations(car_df):
         score = round(100*math.exp(-risk_instance*0.005),2) 
         # trip.append("score"+":"+str(score))
         trip["Score"] = score
-        print(trip)
         Trip_Data.append(trip)
     return Trip_Data
 
