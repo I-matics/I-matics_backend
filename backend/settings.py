@@ -87,7 +87,11 @@ DATABASES = {
         'NAME': os.environ['DBNAME'],
         'HOST': hostname + ".mysql.database.azure.com",
         'USER': os.environ['DBUSER'],
-        'PASSWORD': os.environ['DBPASS'] 
+        'PASSWORD': os.environ['DBPASS'],
+        'PORT': '3306',
+        'OPTIONS': {
+            'ssl': {'ca': os.getcwd()+'//BaltimoreCyberTrustRoot.crt (1).pem'}
+        }
     }
 }
 
