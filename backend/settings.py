@@ -90,7 +90,7 @@ DATABASES = {
         'PASSWORD': os.environ['DBPASS'],
         'PORT': '3306',
         'OPTIONS': {
-            'ssl': {'ca': os.getcwd()+'//BaltimoreCyberTrustRoot.crt (1).pem', 'version': ssl.PROTOCOL_TLSv1_2}
+            'ssl': {'ca': os.getcwd()+'//BaltimoreCyberTrustRoot.crt (1).pem'}
         }
     }
 }
