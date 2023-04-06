@@ -28,6 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['ilscrndmguat-webapp.azurewebsites.net']
 
+SECURE_SSL_REDIRECT = True
 
 # Application definition
 
