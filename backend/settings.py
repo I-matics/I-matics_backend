@@ -90,8 +90,8 @@ DATABASES = {
         'USER': os.environ['DBUSER'],
         'PASSWORD': os.environ['DBPASS'],
         'PORT': '3306',
-        'ssl_ca' = os.getcwd()+'//BaltimoreCyberTrustRoot.crt (1).pem', 
-        'ssl_version' =ssl.PROTOCOL_TLSv1_2
+        'ssl_ca' : os.getcwd()+'//BaltimoreCyberTrustRoot.crt (1).pem', 
+        'ssl_version' : ssl.PROTOCOL_TLSv1_2
     }
 }
 
