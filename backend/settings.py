@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import os
+import ssl
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -89,9 +90,8 @@ DATABASES = {
         'USER': os.environ['DBUSER'],
         'PASSWORD': os.environ['DBPASS'],
         'PORT': '3306',
-        'OPTIONS': {
-            'ssl': {'ca': os.getcwd()+'//BaltimoreCyberTrustRoot.crt (1).pem'}
-        }
+        'ssl_ca' = os.getcwd()+'//BaltimoreCyberTrustRoot.crt (1).pem', 
+        'ssl_version' =ssl.PROTOCOL_TLSv1_2
     }
 }
 
