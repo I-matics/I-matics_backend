@@ -76,7 +76,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-hostname = os.environ['DBHOST']
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
@@ -86,13 +85,10 @@ DATABASES = {
 #         'NAME': ''
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.environ['DBNAME'],
-        'HOST': hostname + ".mysql.database.azure.com",
+        'HOST': os.environ['DBHOST'],
         'USER': os.environ['DBUSER'],
         'PASSWORD': os.environ['DBPASS'],
         'PORT': '3306',
-        'OPTIONS': {
-            'ssl': {'ca': os.getcwd()+'//BaltimoreCyberTrustRoot.crt (1).pem', 'ssl_version': ssl.PROTOCOL_TLSv1_2}
-        }
     }
 }
 
