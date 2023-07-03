@@ -12,6 +12,8 @@ from django.shortcuts import get_object_or_404
 from django.http import Http404
 from .serializers import CarDetailSerializer, UserdetailSerializer
 from .models import CarDetail,UserDetail
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 
 # Create your views here.
 
@@ -158,4 +160,31 @@ def trip_data(request,id_n):
         else:
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def upload_csv_api(request):
+    if request.method == 'POST' and request.FILES.get('csv_file'):
+        csv_file = request.FILES['csv_file']
+
+        # Check if the uploaded file is a CSV file
+        if not csv_file.name.endswith('.csv'):
+            return Response({'error': 'Only CSV files are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Create a file system storage object
+        fs = FileSystemStorage(location=settings.CSV_FILE_DIRECTORY)
+
+        # Save the CSV file to the specified directory
+        file_path = fs.save(csv_file.name, csv_file)
+
+        # Get the full file path
+        full_path = fs.path(file_path)
+
+        # Perform any additional processing on the CSV file if needed
+        # ...
+
+        return Response({'success': 'CSV file uploaded successfully.'}, status=status.HTTP_200_OK)
+
+    return Response({'error': 'No CSV file found in the request.'}, status=status.HTTP_400_BAD_REQUEST)
+
                             
