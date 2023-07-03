@@ -28,6 +28,7 @@ SECRET_KEY = 'django-insecure-#k=c*&+9g4t^fdwb=er(&%3mgvh#j+afv0d##jw*bfok#15wqb
 DEBUG = True
 
 ALLOWED_HOSTS = ['ilscrndmguat-webapp.azurewebsites.net']
+CSV_FILE_DIRECTORY = os.path.join(BASE_DIR, 'csv_file_folder')
 
 
 # Application definition
