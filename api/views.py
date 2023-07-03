@@ -183,7 +183,7 @@ def upload_csv_api(request):
         # Perform any additional processing on the CSV file if needed
         # ...
 
-        return Response({'success': 'CSV file uploaded successfully.'}, status=status.HTTP_200_OK)
+        return Response({'File_Path': full_path}, status=status.HTTP_200_OK)
 
     return Response({'error': 'No CSV file found in the request.'}, status=status.HTTP_400_BAD_REQUEST)
 
