@@ -171,8 +171,11 @@ def upload_csv_api(request):
         if not csv_file.name.endswith('.csv'):
             return Response({'error': 'Only CSV files are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
 
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        CSV_FILE_DIRECTORY = os.path.join(current_directory, 'csv_file_folder')
+
         # Create a file system storage object
-        fs = FileSystemStorage(location=settings.CSV_FILE_DIRECTORY)
+        fs = FileSystemStorage(location=CSV_FILE_DIRECTORY)
 
         # Save the CSV file to the specified directory
         file_path = fs.save(csv_file.name, csv_file)
