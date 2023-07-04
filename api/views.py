@@ -184,6 +184,7 @@ def upload_csv_api(request):
         # # Get the full file path
         # full_path = fs.path(file_path)
         file_location = os.getcwd()+"//csv_file_folder//"+csv_file.name
+        dir = settings.BASE_DIR
         with open(file_location, "wb+") as file_object:
             file_object.write(csv_file.file.read())
         
@@ -191,7 +192,7 @@ def upload_csv_api(request):
         # Perform any additional processing on the CSV file if needed
         # ...
 
-        return Response({'dir':settings.BASE_DIR}, status=status.HTTP_200_OK)
+        return Response({'dir':dir}, status=status.HTTP_200_OK)
 
     return Response({'error': 'No CSV file found in the request.'}, status=status.HTTP_400_BAD_REQUEST)
 
