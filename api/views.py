@@ -191,7 +191,7 @@ def upload_csv_api(request):
         # Perform any additional processing on the CSV file if needed
         # ...
 
-        return Response({'File_Path': file_location,'dir':settings.BASE_DIR}, status=status.HTTP_200_OK)
+        return Response({'dir':settings.BASE_DIR}, status=status.HTTP_200_OK)
 
     return Response({'error': 'No CSV file found in the request.'}, status=status.HTTP_400_BAD_REQUEST)
 
