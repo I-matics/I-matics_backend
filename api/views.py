@@ -183,7 +183,7 @@ def upload_csv_api(request):
 
         # # Get the full file path
         # full_path = fs.path(file_path)
-        file_location = os.getcwd()+"\\csv_file_folder\\"+csv_file.name
+        file_location = os.getcwd()+"//csv_file_folder//"+csv_file.name
         with open(file_location, "wb+") as file_object:
             file_object.write(csv_file.file.read())
         
