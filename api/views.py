@@ -172,22 +172,26 @@ def upload_csv_api(request):
         if not csv_file.name.endswith('.csv'):
             return Response({'error': 'Only CSV files are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        current_directory = os.path.dirname(os.path.abspath(__file__))
-        CSV_FILE_DIRECTORY = os.path.join(current_directory, 'csv_file_folder')
+        # current_directory = os.path.dirname(os.path.abspath(__file__))
+        # CSV_FILE_DIRECTORY = os.path.join(current_directory, 'csv_file_folder')
 
         # Create a file system storage object
-        fs = FileSystemStorage(location=CSV_FILE_DIRECTORY)
+        # fs = FileSystemStorage(location=CSV_FILE_DIRECTORY)
 
-        # Save the CSV file to the specified directory
-        file_path = fs.save(csv_file.name, csv_file)
+        # # Save the CSV file to the specified directory
+        # file_path = fs.save(csv_file.name, csv_file)
 
-        # Get the full file path
-        full_path = fs.path(file_path)
+        # # Get the full file path
+        # full_path = fs.path(file_path)
+        file_location = os.getcwd()+"\\csv_file_folder\\"+csv_file.name
+        with open(file_location, "wb+") as file_object:
+            file_object.write(csv_file.file.read())
+        
 
         # Perform any additional processing on the CSV file if needed
         # ...
 
-        return Response({'File_Path': full_path}, status=status.HTTP_200_OK)
+        return Response({'File_Path': file_location}, status=status.HTTP_200_OK)
 
     return Response({'error': 'No CSV file found in the request.'}, status=status.HTTP_400_BAD_REQUEST)
 
