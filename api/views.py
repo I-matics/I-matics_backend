@@ -188,14 +188,14 @@ def upload_csv_api(request):
         with open(file_location, "wb+") as file_object:
             file_object.write(csv_file.file.read())
         dataset = pd.read_csv(file_location)
-        length = len(dataset['id'])
+        trip_data = calculations(dataset)
         
         
 
         # Perform any additional processing on the CSV file if needed
         # ...
 
-        return Response({'file_path':file_location,'len':length}, status=status.HTTP_200_OK)
+        return Response({'File_Path': file_location, 'Trip Analysis': trip_data}, status=status.HTTP_200_OK)
 
     return Response({'error': 'No CSV file found in the request.'}, status=status.HTTP_400_BAD_REQUEST)
 
