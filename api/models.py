@@ -43,3 +43,18 @@ class CarDetail(models.Model):
     # Hard_Acc = models.IntegerField(null=True)
     # Hard_brake = models.IntegerField(null=True)
     # Hard_cornering = models.IntegerField(null=True)
+
+class TripDetail(models.Model):
+    Tripdetail_id = models.ForeignKey(UserDetail, on_delete=models.CASCADE)
+    Trip_No = models.BigIntegerField(null=True)
+    Risk_Instance = models.FloatField(null=True)
+    Average_speed = models.FloatField(null=True) 
+    Trip_time = models.FloatField(null=True)
+    Distance_Travelled = models.FloatField(null=True)
+    Score = models.FloatField(null=True)
+    C1 = models.TextField(null=True)
+    C2 = models.TextField(null=True)
+    C3 = models.TextField(null=True)
+    C4 = models.FloatField(null=True)
+    C5 = models.FloatField(null=True)
+
