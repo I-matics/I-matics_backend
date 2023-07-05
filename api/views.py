@@ -11,8 +11,8 @@ import os
 from datetime import timedelta
 from django.shortcuts import get_object_or_404
 from django.http import Http404
-from .serializers import CarDetailSerializer, UserdetailSerializer
-from .models import CarDetail,UserDetail
+from .serializers import CarDetailSerializer,TripSerializer, UserdetailSerializer, TripDetailsSerializer, TripDetailsViewSerializer
+from .models import CarDetail,UserDetail,TripDetail
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 
@@ -40,7 +40,6 @@ def calculations(car_df):
     car_df_raw = pd.DataFrame(car_df)
     trip_no = car_df_raw['Trip_no'].unique().tolist()
     if 0 in trip_no: trip_no.remove(0)
-    Trip_Data = []
     for trip_n in trip_no:
         car_df = car_df_raw[car_df_raw['Trip_no'] == trip_n]
         car_df = car_df.reset_index()
@@ -55,6 +54,7 @@ def calculations(car_df):
                 car_df.loc[i, 'count'] = 0 
         risk_instance = car_df['count'].sum()
         # trip.append("Risk_Instance"+":"+str(risk_instance))
+        trip['Tripdetail_id'] = car_df['mob_id'].unique()
         trip["Trip_No"] = trip_n
         trip["Risk_Instance"] = risk_instance
         avg_speed = round(car_df['speed'].mean(),2)
@@ -72,8 +72,7 @@ def calculations(car_df):
         score = round(100*math.exp(-risk_instance*0.005),2) 
         # trip.append("score"+":"+str(score))
         trip["Score"] = score
-        Trip_Data.append(trip)
-    return Trip_Data
+    return trip
 
 
 def Merge(dict1, dict2):
@@ -162,6 +161,16 @@ def trip_data(request,id_n):
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+def get_trip_details(request, id_t):
+    try:
+        trip_details = TripDetail.objects.filter(Tripdetail_id_id=id_t)
+        serializer = TripDetailsViewSerializer(trip_details, many=True)
+        return Response({"Trip Details for user "+ str(id_t):serializer.data}, status=status.HTTP_200_OK)
+    except TripDetail.DoesNotExist:
+        return Response({"error": "Trip details not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
 
 @api_view(['POST'])
 def upload_csv_api(request):
@@ -189,13 +198,16 @@ def upload_csv_api(request):
             file_object.write(csv_file.file.read())
         dataset = pd.read_csv(file_location)
         trip_data = calculations(dataset)
+        serializer = TripDetailsSerializer(data=trip_data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         
         
 
         # Perform any additional processing on the CSV file if needed
         # ...
 
-        return Response({'File_Path': file_location, 'Trip Analysis': trip_data}, status=status.HTTP_200_OK)
+        return Response({'Success': 'File and data sucessfully updated'},status=status.HTTP_201_CREATED)
 
     return Response({'error': 'No CSV file found in the request.'}, status=status.HTTP_400_BAD_REQUEST)
 
