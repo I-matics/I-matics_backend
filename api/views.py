@@ -11,7 +11,7 @@ import os
 from datetime import timedelta
 from django.shortcuts import get_object_or_404
 from django.http import Http404
-from .serializers import CarDetailSerializer,TripSerializer, UserdetailSerializer, TripDetailsSerializer, TripDetailsViewSerializer
+from .serializers import CarDetailSerializer,UserdetailSerializer, TripDetailsSerializer, TripDetailsViewSerializer
 from .models import CarDetail,UserDetail,TripDetail
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
