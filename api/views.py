@@ -166,7 +166,7 @@ def get_trip_details(request, id_t):
     try:
         trip_details = TripDetail.objects.filter(Tripdetail_id_id=id_t)
         serializer = TripDetailsViewSerializer(trip_details, many=True)
-        return Response({"Trip Details for user "+ str(id_t):serializer.data}, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     except TripDetail.DoesNotExist:
         return Response({"error": "Trip details not found"}, status=status.HTTP_404_NOT_FOUND)
 
