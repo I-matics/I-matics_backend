@@ -3,3 +3,4 @@ djangorestframework==3.14.0
 mysqlclient
 whitenoise
 pandas
+boto3
