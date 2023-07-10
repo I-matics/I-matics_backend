@@ -4,3 +4,4 @@ mysqlclient
 whitenoise
 pandas
 boto3
+django-storages
