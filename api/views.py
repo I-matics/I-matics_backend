@@ -15,6 +15,8 @@ from .serializers import CarDetailSerializer,UserdetailSerializer, TripDetailsSe
 from .models import CarDetail,UserDetail,TripDetail
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
+from django.core.files.storage import default_storage
+import io
 
 # Create your views here.
 
@@ -181,28 +183,42 @@ def upload_csv_api(request):
         if not csv_file.name.endswith('.csv'):
             return Response({'error': 'Only CSV files are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # current_directory = os.path.dirname(os.path.abspath(__file__))
-        # CSV_FILE_DIRECTORY = os.path.join(current_directory, 'csv_file_folder')
+        # # current_directory = os.path.dirname(os.path.abspath(__file__))
+        # # CSV_FILE_DIRECTORY = os.path.join(current_directory, 'csv_file_folder')
 
-        # Create a file system storage object
-        # fs = FileSystemStorage(location=CSV_FILE_DIRECTORY)
+        # # Create a file system storage object
+        # # fs = FileSystemStorage(location=CSV_FILE_DIRECTORY)
 
-        # # Save the CSV file to the specified directory
-        # file_path = fs.save(csv_file.name, csv_file)
+        # # # Save the CSV file to the specified directory
+        # # file_path = fs.save(csv_file.name, csv_file)
 
-        # # Get the full file path
-        # full_path = fs.path(file_path)
-        file_location = os.getcwd()+"//csv_file_folder//"+csv_file.name
-        # dir = settings.BASE_DIR
-        with open(file_location, "wb+") as file_object:
-            file_object.write(csv_file.file.read())
-        dataset = pd.read_csv(file_location)
-        trip_data = calculations(dataset)
+        # # # Get the full file path
+        # # full_path = fs.path(file_path)
+        # file_location = os.getcwd()+"//csv_file_folder//"+csv_file.name
+        # # dir = settings.BASE_DIR
+        # with open(file_location, "wb+") as file_object:
+        #     file_object.write(csv_file.file.read())
+        # dataset = pd.read_csv(file_location)
+        # trip_data = calculations(dataset)
+        # serializer = TripDetailsSerializer(data=trip_data)
+        # serializer.is_valid(raise_exception=True)
+        # serializer.save()
+        
+        # Save the file to S3 bucket
+        file_path = 'csv_file_folder/' + csv_file.name
+        default_storage.save(file_path, csv_file)
+        
+        # Process the CSV file and perform any necessary calculations
+        with default_storage.open(file_path, 'rb') as file:
+            file_data = file.read()
+
+        data = pd.read_csv(io.BytesIO(file_data))
+        trip_data = calculations(data)
+
+        # Save the processed data using your serializer
         serializer = TripDetailsSerializer(data=trip_data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        
-        
 
         # Perform any additional processing on the CSV file if needed
         # ...
