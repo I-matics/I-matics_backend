@@ -8,6 +8,10 @@ class CarDetailSerializer(serializers.ModelSerializer):
         # fields = ['time', 'ax', 'ay', 'az', 'speed', 'trip', 'geoloacation']
         fields = '__all__'
 
+class UserIdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserDetail
+        fields = '__all__'
 
 class UserdetailSerializer(serializers.ModelSerializer):
     class Meta:
