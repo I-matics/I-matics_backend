@@ -227,4 +227,14 @@ def upload_csv_api(request):
 
     return Response({'error': 'No CSV file found in the request.'}, status=status.HTTP_400_BAD_REQUEST)
 
-                            
+
+
+@api_view(['POST'])
+def store_mobile_number(request):
+    serializer = UserdetailSerializer(data=request.data)
+    if serializer.is_valid():
+        instance = serializer.save()
+        return Response({'id': instance.id}, status=201)
+    return Response(serializer.errors, status=400)
+
+
