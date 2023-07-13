@@ -11,7 +11,7 @@ import os
 from datetime import timedelta
 from django.shortcuts import get_object_or_404
 from django.http import Http404
-from .serializers import CarDetailSerializer,UserdetailSerializer, TripDetailsSerializer, TripDetailsViewSerializer
+from .serializers import CarDetailSerializer,UserdetailSerializer, TripDetailsSerializer, TripDetailsViewSerializer, UserIdSerializer
 from .models import CarDetail,UserDetail,TripDetail
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
@@ -231,7 +231,7 @@ def upload_csv_api(request):
 
 @api_view(['POST'])
 def store_mobile_number(request):
-    serializer = UserdetailSerializer(data=request.data)
+    serializer = UserIdSerializer(data=request.data)
     if serializer.is_valid():
         instance = serializer.save()
         return Response({'id': instance.id}, status=201)
