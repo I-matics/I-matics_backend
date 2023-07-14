@@ -140,8 +140,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AWS_ACCESS_KEY_ID = 'AKIA2PABX3N2YPQOZE7B'
-AWS_SECRET_ACCESS_KEY = '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'
+
 AWS_STORAGE_BUCKET_NAME = 'csv-file-django'
 AWS_S3_SIGNATURE_NAME = 's3v4',
 AWS_S3_REGION_NAME = 'ap-south-1'
