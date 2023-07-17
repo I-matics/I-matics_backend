@@ -228,13 +228,20 @@ def upload_csv_api(request):
     return Response({'error': 'No CSV file found in the request.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 @api_view(['POST'])
 def store_mobile_number(request):
+    mobile_number = request.data.get('mob')
+    # Check data already exist in database
+    try:
+        user_detail = UserDetail.objects.get(mob=mobile_number)
+        return Response({'id':user_detail.id},status=status.HTTP_200_OK)
+    except UserDetail.DoesNotExist:
+        pass # Continue to save the new record
+    # Mobile Number Does not exist , create a new UserDetail record
     serializer = UserIdSerializer(data=request.data)
     if serializer.is_valid():
         instance = serializer.save()
-        return Response({'id': instance.id}, status=201)
-    return Response(serializer.errors, status=400)
+        return Response({'id':instance.id},status = status.HTTP_201_CREATED)
+    return Response(serializer.errors,status.HTTP_400_BAD_REQUEST)
 
 
