@@ -137,11 +137,7 @@ def generate_random(request,pk):
             car_detail = CarDetail.objects.filter(mob_id_id = pk).values()
         Trip_Data = calculations(car_detail)
         return Response(Trip_Data)
-  
-        # filter data if result>1.3 then check (resultant-(previous resultant))>0.2 then count 1
-        # Average speed, Duration of travel, distance travelled = Average speed*Duration of travel
-        # Return the value
-        # r = random.randint(1,100)
+
 
 @api_view(['GET','PUT'])
 def trip_data(request,id_n):
@@ -182,27 +178,6 @@ def upload_csv_api(request):
         # Check if the uploaded file is a CSV file
         if not csv_file.name.endswith('.csv'):
             return Response({'error': 'Only CSV files are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # # current_directory = os.path.dirname(os.path.abspath(__file__))
-        # # CSV_FILE_DIRECTORY = os.path.join(current_directory, 'csv_file_folder')
-
-        # # Create a file system storage object
-        # # fs = FileSystemStorage(location=CSV_FILE_DIRECTORY)
-
-        # # # Save the CSV file to the specified directory
-        # # file_path = fs.save(csv_file.name, csv_file)
-
-        # # # Get the full file path
-        # # full_path = fs.path(file_path)
-        # file_location = os.getcwd()+"//csv_file_folder//"+csv_file.name
-        # # dir = settings.BASE_DIR
-        # with open(file_location, "wb+") as file_object:
-        #     file_object.write(csv_file.file.read())
-        # dataset = pd.read_csv(file_location)
-        # trip_data = calculations(dataset)
-        # serializer = TripDetailsSerializer(data=trip_data)
-        # serializer.is_valid(raise_exception=True)
-        # serializer.save()
         
         # Save the file to S3 bucket
         file_path = 'csv_file_folder/' + csv_file.name
@@ -219,9 +194,6 @@ def upload_csv_api(request):
         serializer = TripDetailsSerializer(data=trip_data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-
-        # Perform any additional processing on the CSV file if needed
-        # ...
 
         return Response({'Success': 'File and data sucessfully updated'},status=status.HTTP_201_CREATED)
 
