@@ -342,33 +342,37 @@ def get_trip_details(request, id_t):
 
 @api_view(['POST'])
 def upload_csv_api(request):
-    if request.method == 'POST' and request.FILES.get('csv_file'):
-        csv_file = request.FILES['csv_file']
+    try:
+        if request.method == 'POST' and request.FILES.get('csv_file'):
+            csv_file = request.FILES['csv_file']
 
-        # Check if the uploaded file is a CSV file
-        if not csv_file.name.endswith('.csv'):
-            return Response({'error': 'Only CSV files are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Save the file to S3 bucket
-        file_path = 'csv_file_folder/' + csv_file.name
-        default_storage.save(file_path, csv_file)
-        
-        # Process the CSV file and perform any necessary calculations
-        with default_storage.open(file_path, 'rb') as file:
-            file_data = file.read()
+            # Check if the uploaded file is a CSV file
+            if not csv_file.name.endswith('.csv'):
+                return Response({'error': 'Only CSV files are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Save the file to S3 bucket
+            file_path = 'csv_file_folder/' + csv_file.name
+            default_storage.save(file_path, csv_file)
+            
+            # Process the CSV file and perform any necessary calculations
+            with default_storage.open(file_path, 'rb') as file:
+                file_data = file.read()
 
-        data = pd.read_csv(io.BytesIO(file_data))
+            data = pd.read_csv(io.BytesIO(file_data))
 
-        trip_data = process_trip_data(data)
-        mapped_trip_data = map_trip_data_to_model(trip_data)
-        mapped_trip_data["C3"] = file_path
-        # Save the processed data using your serializer
-        serializer = TripDetailsSerializer(data=mapped_trip_data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+            trip_data = process_trip_data(data)
+            mapped_trip_data = map_trip_data_to_model(trip_data)
+            mapped_trip_data["C3"] = file_path
+            # Save the processed data using your serializer
+            serializer = TripDetailsSerializer(data=mapped_trip_data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
 
-        return Response({'Success': 'File and data sucessfully updated'},status=status.HTTP_201_CREATED)
-    return Response({'error': 'No CSV file found in the request.'}, status=status.HTTP_400_BAD_REQUEST)
+            # return Response({'Success': 'File and data sucessfully updated'},status=status.HTTP_201_CREATED)
+            return Response({'Success': 'File and data sucessfully updated'},status=status.HTTP_201_CREATED)
+        return Response({'error': 'No CSV file found in the request.'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])
