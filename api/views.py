@@ -17,8 +17,161 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.core.files.storage import default_storage
 import io
+from api.Scoring.helper_functions import fir_filter, ekf_filter, calculate_exponential_score
+from api.Scoring.speeding import overspeed_score
+from api.Scoring.extrapolation import create_smooth_curve
+import api.Scoring.timeoftravel
+from api.Scoring.acceleration import capture_peaks_and_differentiate2
+from api.Scoring.distance import distance_based_risk
 
 # Create your views here.
+
+def map_trip_data_to_model(data):
+    # Define a mapping between dictionary keys and model fields
+    field_mapping = {
+        "Trip No":"Trip_No",
+        "Tripdetail_id": "Tripdetail_id" ,
+        "Total Distance": "Risk_Instance",
+        "Overspeed Score": "Average_speed",
+        "Acceleration Score": "Trip_time",
+        "Braking Score": "Distance_Travelled",
+        "Time of Travel Score": "Score",
+        "Distance Score": "C1",
+        "Total Averaged Score": "C2",
+        "Exponential Score": "C4",
+    }
+
+    mapped_data = {}
+    for key, field_name in field_mapping.items():
+        if key in data:
+            mapped_data[field_name] = data[key]
+
+    return mapped_data
+
+
+def process_trip_data(doc):
+    
+    tripdetail_id = doc['mob_id'].unique()
+    trip_n = doc['Trip_no'].unique()
+
+    # Frequency
+    freq = 50
+
+    # Calculate total distance
+    total_distance = sum((doc["speed"] * (5 / 18)) / freq) / 1000
+
+    if total_distance <= 0.5:
+        return "Low Distance"
+    # Take a reading from the speed list once every 50 times into  a separate list
+    speed = doc["speed"]
+    speed_data = [speed[i] for i in range(len(speed)) if i % freq == 0]
+
+    # Overspeeding parameters
+    original_frequency = 1
+    target_frequency = 50
+    target_time, smoothed_speed_data = create_smooth_curve(speed_data, original_frequency, target_frequency)
+    overspeeding_weight = 0.1
+    speed_limit = 40
+    speed_exponent = 0.8
+
+    # Calculate Overspeed score
+    overspeed_score_value = overspeed_score(
+        speed_data=speed_data,
+        overspeeding_weight=overspeeding_weight,
+        speed_limit=speed_limit,
+        speed_exponent=speed_exponent,
+    )
+
+    # Hard acceleration/braking parameters
+    acceleration_threshold = 17
+    acceleration_weight = 0.3
+    event_time = 1
+    braking_weight = 0.4
+    acc_exponent = 0.3
+    brak_exponent = 0.3
+
+    # FIR filter parameters
+    filter_order = 25
+    fir_cutoff = 5
+
+    # Filter and orient the data
+    oax, oay, oaz, ogx, ogy, ogz, omx, omy, omz = fir_filter(
+        doc, filter_order=filter_order, sampling_freq=freq, fir_cutoff=fir_cutoff
+    )
+
+    # Orientation of the filtered data
+    ax, ay, az = ekf_filter(ax=oax, ay=oay, az=oaz, gx=ogx, gy=ogy, gz=ogz, mx=omx, my=omy, mz=omz)
+
+    # Get the acceleration score
+    peak_events, acceleration_score, braking_score = capture_peaks_and_differentiate2(
+        ax_data=ax,
+        ay_data=ay,
+        speed_data=smoothed_speed_data,
+        acc_exponent=acc_exponent,
+        brak_exponent=brak_exponent,
+        threshold=acceleration_threshold,
+        time=event_time,
+        data_freq=freq,
+    )
+
+    for event in peak_events:
+        if event == "Hard Acceleration":
+            acceleration_score += acceleration_weight
+        elif event == "Hard Braking":
+            braking_score += braking_weight
+
+    # Time-based risk parameters
+    time_weights = 1
+    time_exponent_indice = 2
+
+    # Get the time of travel score
+    time_of_travel_score = (
+        api.Scoring.timeoftravel.time_based_risk(timedata=doc["Trip_time"], exponential_indice=time_exponent_indice)
+        * time_weights
+    )
+
+    # Distance-based risk parameters
+    distance_weight = 1
+    distance_exponential_indice = 0.34
+
+    # Get the distance-based score
+    distance_score = (
+        distance_based_risk(total_distance, exponential_indice=distance_exponential_indice)
+        * distance_weight
+    )
+
+    # Total Averaged Score
+    total_score = (
+        overspeed_score_value
+        + acceleration_score
+        + braking_score
+        + time_of_travel_score
+        + distance_score
+    ) / total_distance
+
+    # Exponential Score Parameters
+    exponent_multiplier = 0.018
+    exponent_base = 2
+
+    # Calculate the exponential score
+    exponent_score = calculate_exponential_score(
+        risk_score=total_score, base=exponent_base, exponent_multiplier=exponent_multiplier
+    )
+
+    # Return all data points
+    return {
+        "Tripdetail_id": tripdetail_id[0],
+        "Trip No":trip_n[0],
+        "Total Distance": total_distance,
+        "Overspeed Score": overspeed_score_value,
+        "Acceleration Score": acceleration_score,
+        "Braking Score": braking_score,
+        "Time of Travel Score": time_of_travel_score,
+        "Distance Score": distance_score,
+        "Total Averaged Score": total_score,
+        "Exponential Score": exponent_score,
+    }
+
 
 
 def Trip_Abs_Scoring(x, y, z, p):
@@ -164,10 +317,27 @@ def get_trip_details(request, id_t):
     try:
         trip_details = TripDetail.objects.filter(Tripdetail_id_id=id_t)
         serializer = TripDetailsViewSerializer(trip_details, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        # Modify the field names in the serialized data
+        modified_data = []
+        for item in serializer.data:
+            modified_item = {
+                'Trip No': item['Trip_No'],  # Replace with your desired field name
+                # 'Tripdetail Id': item['Tripdetail_id'],
+                'Total Distance': item['Risk_Instance'],
+                'Overspeed Score': item['Average_speed'],  # Replace with your desired field name
+                'Acceleration Score': item['Trip_time'],
+                'Braking Score': item['Distance_Travelled'],
+                'Time of Travel Score': item['Score'],  # Replace with your desired field name
+                'Distance Score': item['C1'],
+                'Total Averaged Score': item['C2'],
+                'Exponential Score': item['C4'],
+                # Add other fields as needed
+            }
+            modified_data.append(modified_item)
+        print(modified_data)
+        return Response(modified_data, status=status.HTTP_200_OK)
     except TripDetail.DoesNotExist:
         return Response({"error": "Trip details not found"}, status=status.HTTP_404_NOT_FOUND)
-
 
 
 @api_view(['POST'])
@@ -188,15 +358,16 @@ def upload_csv_api(request):
             file_data = file.read()
 
         data = pd.read_csv(io.BytesIO(file_data))
-        trip_data = calculations(data)
 
+        trip_data = process_trip_data(data)
+        mapped_trip_data = map_trip_data_to_model(trip_data)
+        mapped_trip_data["C3"] = file_path
         # Save the processed data using your serializer
-        serializer = TripDetailsSerializer(data=trip_data)
+        serializer = TripDetailsSerializer(data=mapped_trip_data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
         return Response({'Success': 'File and data sucessfully updated'},status=status.HTTP_201_CREATED)
-
     return Response({'error': 'No CSV file found in the request.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
