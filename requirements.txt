@@ -5,3 +5,5 @@ whitenoise
 pandas
 boto3
 django-storages
+AHRS
+scipy
