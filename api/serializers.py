@@ -30,6 +30,7 @@ class TripDetailsViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = TripDetail
         # fields = ['time', 'ax', 'ay', 'az', 'speed', 'trip', 'geoloacation']
-        fields = ['Trip_No', 'Risk_Instance', 'Average_speed', 'Trip_time', 'Distance_Travelled', 'Score']
+        fields = ['Trip_No', 'Risk_Instance', 'Average_speed', 'Trip_time', 'Distance_Travelled', 'Score', 'C1', 'C2', 'C4']
         # fields = '__all__'
+
 
